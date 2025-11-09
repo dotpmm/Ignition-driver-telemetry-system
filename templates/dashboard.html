@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Driver Telemetry Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
+  <h1 class="text-3xl font-bold text-cyan-400 mb-6">Driver Telemetry Dashboard</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl">
+    <div class="bg-gray-800 p-4 rounded-2xl shadow-xl">
+      <h2 class="text-xl font-semibold mb-2">Pitch & Roll (Orientation)</h2>
+      <canvas id="tiltChart"></canvas>
+    </div>
+
+    <div class="bg-gray-800 p-4 rounded-2xl shadow-xl">
+      <h2 class="text-xl font-semibold mb-2">Speed & Acceleration</h2>
+      <canvas id="speedChart"></canvas>
+    </div>
+
+    <div class="bg-gray-800 p-4 rounded-2xl shadow-xl">
+      <h2 class="text-xl font-semibold mb-2">Compass Heading (°)</h2>
+      <canvas id="compassChart"></canvas>
+    </div>
+
+    <div class="bg-gray-800 p-4 rounded-2xl shadow-xl text-center flex flex-col justify-center">
+      <h2 class="text-2xl font-semibold mb-2">Current Status</h2>
+      <p id="status" class="text-3xl font-bold text-cyan-300 mb-4">Waiting for data...</p>
+   
+      <p id="jerk" class="text-lg text-red-400">Jerk: None</p>
+    </div>
+  </div>
+
+  <script>
+    const makeChart = (ctx, label1, label2) => new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          { label: label1, data: [], borderWidth: 2 },
+          { label: label2, data: [], borderWidth: 2 }
+        ]
+      },
+      options: {
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { labels: { color: 'white' } } }
+      }
+    });
+
+    const tiltChart = makeChart(document.getElementById('tiltChart'), 'Pitch (°)', 'Roll (°)');
+    const speedChart = makeChart(document.getElementById('speedChart'), 'Speed (km/h)', 'Accel Magnitude');
+    const compassChart = new Chart(document.getElementById('compassChart'), {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{ label: 'Compass (°)', data: [], borderWidth: 2 }]
+      },
+      options: {
+        scales: { y: { beginAtZero: false } },
+        plugins: { legend: { labels: { color: 'white' } } }
+      }
+    });
+
+    async function fetchData() {
+      const res = await fetch('/data');
+      const data = await res.json();
+
+      if (!data.length) return;
+
+      const labels = data.map(d => new Date(d.timestamp).toLocaleTimeString());
+      const pitch = data.map(d => d.pitch);
+      const roll = data.map(d => d.roll);
+      const speed = data.map(d => d.speed);
+      const acc_mag = data.map(d => d.acc_mag);
+      const compass = data.map(d => d.compass);
+
+      tiltChart.data.labels = labels;
+      tiltChart.data.datasets[0].data = pitch;
+      tiltChart.data.datasets[1].data = roll;
+      tiltChart.update();
+
+      speedChart.data.labels = labels;
+      speedChart.data.datasets[0].data = speed;
+      speedChart.data.datasets[1].data = acc_mag;
+      speedChart.update();
+
+      compassChart.data.labels = labels;
+      compassChart.data.datasets[0].data = compass;
+      compassChart.update();
+
+      const latest = data[data.length - 1];
+      document.getElementById("status").textContent = latest.status;
+  
+      document.getElementById("jerk").textContent = latest.sudden_jerk ? "Jerk: Detected!" : "Jerk: None";
+    }
+
+    setInterval(fetchData, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Driver Path Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body { margin:0; background:#0f172a; color:#e2e8f0; font-family:sans-serif; }
+    #map { height:100vh; width:100%; }
+    .info { position:absolute; top:10px; left:10px; background:#1e293b; padding:8px 12px; border-radius:6px; font-size:14px; z-index:1000; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="info" id="info">Live GPS Path</div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([20.5937, 78.9629], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const polyline = L.polyline([], { color: 'deepskyblue', weight: 4 }).addTo(map);
+    let lastMarker = null;
+
+    async function updateMap() {
+      try {
+        const res = await fetch('/gpsdata');
+        if (!res.ok) throw new Error('fetch failed');
+        const points = await res.json();
+
+        if (!points || points.length === 0) {
+          document.getElementById('info').textContent = 'No GPS points yet.';
+          return;
+        }
+
+        document.getElementById('info').textContent = `Points: ${points.length}`;
+
+        const latlngs = points.map(p => [p.lat, p.lon]);
+        polyline.setLatLngs(latlngs);
+
+        const last = points[points.length - 1];
+        const lastLatLng = [last.lat, last.lon];
+
+        if (lastMarker) map.removeLayer(lastMarker);
+        lastMarker = L.marker(lastLatLng).addTo(map);
+        let ts = last.timestamp;
+        try { ts = new Date(ts).toLocaleString(); } catch(e) {}
+        lastMarker.bindPopup(`Last: ${ts}`).openPopup();
+
+        if (latlngs.length === 1) {
+          map.setView(latlngs[0], 16);
+        } else {
+          map.fitBounds(polyline.getBounds().pad(0.2));
+        }
+      } catch (err) {
+        console.error('updateMap error', err);
+        document.getElementById('info').textContent = 'Error fetching GPS data';
+      }
+    }
+
+    setInterval(updateMap, 1500);
+    updateMap();
+  </script>
+</body>
+</html>
