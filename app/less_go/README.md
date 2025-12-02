@@ -1,16 +1,28 @@
-# less_go
+# Team McQueen Sensor Streamer App (less_go)
 
-A new Flutter project.
+A lightweight Flutter application that captures device sensor data and streams it to a backend endpoint in real time.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+* Collects accelerometer, gyroscope, compass heading, and GPS position.
+* Buffers readings and posts them to a server every 200ms.
+* Configurable server endpoint (persisted locally).
+* Permission-aware (location + sensor access).
+* Live on-screen preview of sensor values.
 
-A few resources to get you started if this is your first Flutter project:
+## Stack
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+* Flutter (Material)
+* sensors_plus
+* flutter_compass
+* geolocator
+* permission_handler
+* http
+* shared_preferences
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Usage
+
+1. Install the app on an Android device.
+2. Enter your backend API endpoint in the text field.
+3. Grant required permissions.
+4. The app will begin streaming sensor data automatically.
