@@ -1,3 +1,13 @@
+"""
+
+Flask-based data ingestion and analytics server for the mobile sensor-tracking app.
+Handles JSON sensor payloads (accelerometer, gyroscope, GPS), classifies user activity,
+detects sudden motion events, logs all records, and exposes endpoints for dashboards,
+GPS mapping, and real-time data visualization.
+
+"""
+
+
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from collections import deque
 import math, time, numpy as np
