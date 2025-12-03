@@ -7,7 +7,7 @@ Finished 11th out of 59 teams at the Ignition 1.0 Hackathon, conducted by Team V
 
 ## Project Overview
 This project is a mobile-based driver telemetry and rider-state detection system that collects real-time sensor data from a smartphone and classifies rider movement into walking, running, scooter, or bike riding.
-The phone is mounted securely on the rider’s chest using a normal belt, enabling accurate motion and orientation capture without additional sensors or hardware modules.
+The phone is mounted securely onto the rider’s chest using a normal belt, enabling accurate motion and orientation capture without needing additional sensors or hardware modules.
 
 The system visualizes live telemetry, GPS routes, speed, and motion data within a mobile app and stores all readings locally with timestamps.
 
