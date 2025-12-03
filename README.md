@@ -49,4 +49,4 @@ The mounted position captures torso orientation changes and vibration/tilt patte
 ## Team Members 
 [![Contributors](https://contrib.rocks/image?repo=dotpmm/ignition-driver-telemetry-system&nocache=1)](https://github.com/dotpmm/ignition-driver-telemetry-system/graphs/contributors)
 
-## If you found this project interesting, consider giving the repo a star ⭐!
+## If you found this project interesting, consider giving the repo a star ⭐!!
